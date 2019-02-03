@@ -16,19 +16,17 @@
 
                    myVideo.srcObject = stream;
                    myVideo.play();
-
                   
               }).catch(function(err) {
                   console.log("Unable to get video stream: " + err);
               });
             }
-
             startVideoStream();
-
             const FPS = 30;
             function processVideo() {
                 let begin = Date.now();
                 context.drawImage(myVideo, 0, 0, videoWidth, videoHeight);
+                image_data = context.getImageData(0, 0, videoWidth, videoHeight).data;
                 let delay = 1000/FPS - (Date.now() - begin);
                 setTimeout(processVideo, delay);
             }
