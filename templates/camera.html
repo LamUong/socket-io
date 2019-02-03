@@ -2,8 +2,11 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script >
         function init(){
+            var socket = io('http://127.0.0.1:5000/');
             let myVideo = document.getElementById("myVideo");
             let canvasFrame = document.getElementById("canvasFrame");
             let canvasOutput = document.getElementById("canvasOutput");
@@ -13,29 +16,31 @@
 
             function startVideoStream(){
               navigator.mediaDevices.getUserMedia({audio: false, video: { width: videoWidth, height: videoHeight }}).then(function(stream) {
-
                    myVideo.srcObject = stream;
                    myVideo.play();
-                  
               }).catch(function(err) {
                   console.log("Unable to get video stream: " + err);
               });
             }
             startVideoStream();
-            const FPS = 30;
+            const FPS = 60;
             function processVideo() {
                 let begin = Date.now();
                 context.drawImage(myVideo, 0, 0, videoWidth, videoHeight);
                 image_data = context.getImageData(0, 0, videoWidth, videoHeight).data;
+                // socket.emit('image_data', image_data);
                 let delay = 1000/FPS - (Date.now() - begin);
                 setTimeout(processVideo, delay);
             }
             // schedule first one.
             setTimeout(processVideo, 0);
+
+            socket.on('image_data', function(msg){
+                console.log("here");
+                console.log(msg);       
+            });
         }
         
-
-
     </script>
 </head>
 <body onload="init()">
